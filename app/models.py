@@ -1,4 +1,5 @@
 from datetime import datetime
+from hashlib import md5
 
 from app import db, bcrypt, login
 from flask_login import UserMixin
@@ -9,6 +10,8 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
+    about_me = db.Column(db.String(140))
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
     posts = db.relationship('Post', backref='author', lazy='dynamic')
 
@@ -20,6 +23,12 @@ class User(db.Model, UserMixin):
 
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password_hash, password)
+
+    def avatar(self, size):
+        digest = md5(bytes(self.email.lower(), encoding='utf-8')).hexdigest()
+
+        return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(
+            digest, size)
 
 
 class Post(db.Model):
