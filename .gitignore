@@ -5,6 +5,7 @@
 ### Folders ###
 .vscode
 .idea
+logs
 
 ### SQLite ###
 *.sqlite
